@@ -21,6 +21,10 @@ find_library(
 
 message(STATUS "tensorflow_framework library found: in ${TF_FRAMEWORK}")
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/nebula_client/include/")
+ 
+link_directories("${CMAKE_CURRENT_SOURCE_DIR}/nebula_client/so")
+
 add_library(tf_euler SHARED
             ops/sample_ops.cc
             ops/feature_ops.cc
@@ -35,6 +39,7 @@ add_library(tf_euler SHARED
             kernels/scatter_op.cc
 
             kernels/sample_node_op.cc
+            kernels/nebula_sample_node_op.cc
             kernels/sample_n_with_types_op.cc
             kernels/sample_edge_op.cc
 
@@ -42,6 +47,7 @@ add_library(tf_euler SHARED
 
             kernels/get_binary_feature_op.cc
             kernels/get_dense_feature_op.cc
+            kernels/nebula_get_dense_feature_op.cc
             kernels/get_sparse_feature_op.cc
             kernels/get_edge_binary_feature_op.cc
             kernels/get_edge_dense_feature_op.cc
@@ -51,6 +57,7 @@ add_library(tf_euler SHARED
             kernels/get_sorted_full_neighbor_op.cc
             kernels/get_top_k_neighbor_op.cc
             kernels/sample_neighbor_op.cc
+            kernels/nebula_sample_neighbor_op.cc
             kernels/random_walk_op.cc
             kernels/gen_pair_op.cc
             kernels/inflate_idx_op.cc
@@ -64,9 +71,10 @@ add_library(tf_euler SHARED
             kernels/get_graph_by_label_op.cc
 
             utils/init_query_proxy.cc
+            utils/init_nebula_graph.cc
 )
 
-target_link_libraries(tf_euler euler_core ${TF_FRAMEWORK} jemalloc_STATIC_PIC)
+target_link_libraries(tf_euler euler_core ${TF_FRAMEWORK} jemalloc_STATIC_PIC nebula_client)
 target_include_directories(tf_euler BEFORE PRIVATE ${TF_INC_DIR}
                            "${TF_INC_DIR}/external/nsync/public/")
 

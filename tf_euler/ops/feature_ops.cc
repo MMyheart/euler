@@ -136,6 +136,60 @@ N: size of feature ids
 
 )doc");
 
+REGISTER_OP("NebulaGetDenseFeature")
+    .Input("nodes: int64")
+    .Output("features: N * float")
+    .Attr("feature_names: list(string)")
+    .Attr("dimensions: list(int)")
+    .Attr("N: int")
+    .Attr("space_name: string")
+    .Attr("node_types: list(string)")
+    .SetShapeFn(
+        [](InferenceContext *c)
+        {
+          int N;
+          std::string space_name;
+          ShapeHandle nodes;
+          std::vector<int> dimensions;
+          std::vector<std::string> feature_names;
+          std::vector<std::string> node_types;
+ 
+          TF_RETURN_IF_ERROR(c->WithRank(c->input(0), 1, &nodes));
+          TF_RETURN_IF_ERROR(c->GetAttr("feature_names", &feature_names));
+          TF_RETURN_IF_ERROR(c->GetAttr("dimensions", &dimensions));
+          TF_RETURN_IF_ERROR(c->GetAttr("N", &N));
+          TF_RETURN_IF_ERROR(c->GetAttr("space_name", &space_name));
+          TF_RETURN_IF_ERROR(c->GetAttr("node_types", &node_types));
+ 
+          if (dimensions.size() != feature_names.size() ||
+              dimensions.size() != static_cast<size_t>(N)) {
+            return Status(
+                error::INVALID_ARGUMENT,
+                "Invalid dimension or feature ids size");
+          }
+ 
+          for (int i = 0; i < N; ++i) {
+            std::vector<DimensionHandle> dims;
+            dims.emplace_back(c->Dim(nodes, 0));
+            dims.emplace_back(c->MakeDim(dimensions[i]));
+            c->set_output(i, c->MakeShape(dims));
+          }
+          return Status::OK(); })
+    .Doc(R"doc(
+NebulaGetDenseFeature.
+ 
+Get dense features for nodes.
+ 
+nodes: Input, nodes to get dense features for
+features: Output, N float tensors for the result dense features
+feature_names: feature names to retrieve
+dimensions: dimension for each feature
+N: size of feature ids
+space_name: specify space
+node_types: all node type
+ 
+)doc");
+
 ///////////////////////////// Get Edge Feature OP /////////////////////////////
 
 

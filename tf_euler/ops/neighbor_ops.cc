@@ -320,4 +320,49 @@ ND : the number of dense feature tensors. should be (layer_count + 1) * dense_fe
 NS : the number of sparse feature tensors. should be (layer_count + 1) * sparse_feature_num
 )doc");
 
+REGISTER_OP("NebulaSampleNeighbor")
+    .Input("nodes: int64")
+    .Input("edge_types: string")
+    .SetIsStateful()
+    .Output("neighbors: int64")
+    .Output("weights: float")
+    .Output("types: int32")
+    .Attr("space_name: string")
+    .Attr("all_edge_types: list(string)")
+    .Attr("count: int")
+    .Attr("default_node: int = -1")
+    .SetShapeFn(
+        [](InferenceContext *c)
+        {
+                    ShapeHandle nodes;
+                    //ShapeHandle edge_types;
+                    int count = 0;
+                    TF_RETURN_IF_ERROR(c->WithRank(c->input(0), 1, &nodes));
+                    //TF_RETURN_IF_ERROR(c->WithRank(c->output(2), 1, &edge_types));
+                    TF_RETURN_IF_ERROR(c->GetAttr("count", &count));
+ 
+                    std::vector<DimensionHandle> dims;
+                    dims.emplace_back(c->Dim(nodes, 0));
+                    dims.emplace_back(c->MakeDim(count));
+                    c->set_output(0, c->MakeShape(dims));
+                    c->set_output(1, c->MakeShape(dims));
+                    c->set_output(2, c->MakeShape(dims));
+ 
+                    return Status::OK(); })
+    .Doc(R"doc(
+NebulaSampleNeighbor
+ 
+Nebula Sample Neighbors for nodes.
+ 
+nodes: Input, the nodes to sample neighbors for
+edge_types: Input, the outing edge types to sample neighbors for
+neighbors: Output, the sample result
+weights: Output, the sample result
+types: Output, the sample result
+space_name: specify space
+all_edge_types: all edge type
+count: sample neighbor count for each node
+default_node: default filling node if node has no neighbor
+)doc");
+
 }  // namespace tensorflow

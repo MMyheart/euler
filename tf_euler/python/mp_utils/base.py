@@ -44,6 +44,8 @@ class SuperviseModel(object):
         loss = tf.nn.sigmoid_cross_entropy_with_logits(
             labels=label, logits=logit)
         loss = tf.reduce_mean(loss)
+        tf.summary.scalar("loss", loss)
+        tf.summary.scalar("mrr", metric)
         return (embedding, loss, self.metric_name, metric)
 
 
@@ -87,5 +89,7 @@ class UnsuperviseModel(object):
         loss = tf.reduce_mean(tf.concat([tf.reshape(true_xent, [-1, 1]),
                                         tf.reshape(negative_xent,
                                                    [-1, 1])], 0))
+        tf.summary.scalar("loss", loss)
+        tf.summary.scalar("mrr", metric)
         embedding = self.embed(inputs)
         return (embedding, loss, self.metric_name, metric)

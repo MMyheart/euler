@@ -38,6 +38,26 @@ nodes: Output, sample result nodes
 
 )doc");
 
+REGISTER_OP("NebulaSampleNode")
+    .Input("count: int32")
+    .Input("node_type: string")
+    .Attr("space_name: string")
+    .Attr("condition: string = ''")
+    .SetIsStateful()
+    .Output("nodes: int64")
+    .SetShapeFn(shape_inference::UnknownShape)
+    .Doc(R"doc(
+NebulaSampleNode
+ 
+Sample nodes by type, using as negative sample.
+See https://arxiv.org/abs/1607.00653 for reference.
+ 
+count: Input, sample nodes count
+node_type: Input, sample node type
+nodes: Output, sample result nodes
+ 
+)doc");
+
 REGISTER_OP("SampleNWithTypes")
     .Input("count: int32")
     .Input("node_types: int32")

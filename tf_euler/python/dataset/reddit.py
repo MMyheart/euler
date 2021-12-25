@@ -50,7 +50,7 @@ class reddit(DataSet):
         self.feature_idx = 'feature'
         self.feature_dim = 602
         self.label_idx = 'label'
-        self.label_dim = 1
+        self.label_dim = 41
         self.num_classes = 41
 
     def download_data(self, source_url, out_dir):
@@ -80,7 +80,9 @@ class reddit(DataSet):
                 node_buf['features'] = [{}, {}]
                 node_buf['features'][0]['name'] = 'label'
                 node_buf['features'][0]['type'] = 'dense'
-                node_buf['features'][0]['value'] = [class_map[node_id]]
+                label_one_hot = [0] * 41
+                label_one_hot[class_map[node_id]] = 1
+                node_buf['features'][0]['value'] = label_one_hot
                 node_buf['features'][1]['name'] = 'feature'
                 node_buf['features'][1]['type'] = 'dense'
                 node_buf['features'][1]['value'] = list(feats[idx])

@@ -47,6 +47,8 @@ def get_node_type_id(type_id_or_names):
       A 1-d Tensor of Node TypeId
     """
 
+    if base.nebula_ops['get_node_type_id']:
+        return type_id_or_names
     return _get_type_id(base._LIB_OP.get_node_type_id, type_id_or_names)
 
 
@@ -61,4 +63,6 @@ def get_edge_type_id(type_id_or_names):
       A 1-d Tensor of Edge TypeIds
     """
 
+    if base.nebula_ops['get_edge_type_id']:
+        return type_id_or_names
     return _get_type_id(base._LIB_OP.get_edge_type_id, type_id_or_names)
